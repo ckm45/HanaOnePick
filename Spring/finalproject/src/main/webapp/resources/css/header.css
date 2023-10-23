@@ -1,0 +1,68 @@
+.logo {
+    margin-left: 12%;
+    margin-top: 1%;
+    height: 10vh;
+    z-index: 99;
+    font-size: 3vh;
+}
+
+.logo-link {
+    align-items: center;
+    text-decoration: none;
+    color: black;
+}
+
+.nav-logo {
+    height: 100%;
+}
+
+.nav {
+    margin-right: 6%;
+    margin-top: 2%;
+    flex-grow: 0.9;
+}
+
+.nav-item {
+    font-size: 3vh;
+}
+
+.nav-bar {
+    margin-bottom: 3%;
+    height: 10vh;
+    display: flex;
+}
+
+.nav-link {
+    color: black;
+}
+
+.welcome-msg{
+    text-align: right;
+    margin-right: 11.8%;
+    margin-top: -2%;
+    margin-bottom: 1%;
+    font-size: 1.9vh;
+
+}
+
+@media screen and (max-width: 768px)
+{
+    .welcome-msg{
+        display: none;
+    }
+    hr{
+        display: none;
+    }
+
+    .nav-bar {
+        margin-bottom: 3%;
+        display: flex;
+    }
+
+}
+
+@media screen and (max-width: 768px){
+    .logo{
+        display: none;
+    }
+}

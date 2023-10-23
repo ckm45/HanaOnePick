@@ -1,0 +1,115 @@
+.transaction-hr{
+    border: 0;
+    height: 3px;
+    background-color: black;
+}
+
+.select-card{
+    width: 60%;
+    background-color: white;
+    margin-right: 5%;
+}
+
+.select-date{
+    width: 33%;
+    background-color: white;
+}
+.search-transactions-section{
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #fafafa;
+    padding: 1.5%;
+}
+.select-card-title{
+    padding: 1.5%;
+    background-color: #e6e7ea;
+    font-size: 1.5vw;
+}
+.card-list{
+    padding: 1.5%;
+    font-size: 1vw;
+}
+.date-list{
+    padding: 1.8%;
+    font-size: 1vw;
+}
+.search-transactions{
+    width: 60%;
+    margin: 0 auto;
+    height: 50vh !important;
+    font-size: 2.5vw;
+}
+
+.select-button{
+    background-color: #03847d;
+    color: white;
+    width: 10vw;
+    margin: 1% auto;
+    font-size: 1.8vw;
+    text-align: center;
+}
+
+.card-list, .date-list, .select-button {
+    cursor: pointer;
+}
+
+/*테이블 가리기*/
+#table-box {
+    display: none;
+}
+
+.result-transactions{
+    width: 60%;
+    margin: 0 auto;
+}
+
+.chart-transactions{
+    display: none;
+    width: 60%;
+    margin: 0 auto;
+    height: 40vh !important;
+}
+
+.amount-cell {
+    text-align: right;
+}
+
+
+.datepicker table tr td.day:first-child {
+    color: red;
+}
+
+@font-face {
+    font-family: 'Hana2-Light';
+    src: url('../../resources/fonts/Hana2-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.card-header{
+    font-size: 1.2vw;
+}
+
+#datatablesSimple{
+    border: 3px solid #ddd;
+    font-size: 1.2vw;
+}
+table.dataTable thead th {
+    font-family: 'Hana2-Light', sans-serif !important;
+    padding: 3%;
+}
+
+table.dataTable tbody tr {
+    background-color: #f8f9fc;
+}
+
+table.dataTable tbody tr:nth-child(even) {
+    background-color: #e9ecef;
+}
+
+p strong{
+    font-size: 1.2vw;
+}
+.modal-body span{
+    font-size: 1.2vw;
+}

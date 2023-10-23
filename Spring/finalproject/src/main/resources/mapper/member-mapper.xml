@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kopo.finalproject.model.dao.MemberDAO">
+    <select id="memberLoginCheck" resultType="com.kopo.finalproject.model.dto.MemberDTO">
+        select member_id          as memberId,
+               name               as name,
+               personal_id        as personalIdNumber,
+               password           as password,
+               email              as email,
+               reg_date           as regDate,
+               gender             as gender,
+               phone_number       as phone,
+               zipcode            as zipcode,
+               address            as address,
+               detail_address     as detailAddress,
+               age                as age,
+               member_status_code as memberStatus
+        from member
+        where member_id = #{ckId}
+          and password = #{ckPw}
+    </select>
+
+
+    <select id="getCardList" parameterType="String" resultType="com.kopo.finalproject.model.dto.MyCardDTO">
+        select mc.card_number       as cardNumber,
+               mc.card_password     as cardPassword,
+               mc.validation_period as validationPeriod,
+               mc.cvc_number        as cvcNumber,
+               mc.card_regdate      as cardRegDate,
+               mc.last_month_total  as lastMonthTotal,
+               mc.card_status_code  as cardStatus,
+               mc.card_id           as cardId,
+               mc.member_id         as memberId,
+               c.card_name          as cardName
+        from membercard mc
+                 join card c on mc.card_id = c.card_id
+        where mc.member_id = #{memberId}
+    </select>
+
+    <select id="getDistinctPerformanceValue" resultType="java.lang.Integer">
+        SELECT DISTINCT card_performance as benefitCount
+        FROM benefit
+        WHERE card_id = #{cardId}
+    </select>
+
+    <select id="getTransactionHistoryListByCardNumber"
+            resultType="com.kopo.finalproject.model.dto.TransactionHistoryDTO">
+        select transaction_id as transactionId,
+        transaction_date as transactionDate,
+        transaction_amount as transactionAmount,
+        card_number as cardNumber,
+        member_id as memberId,
+        transaction_industry_code as transactionIndustryCode,
+        transaction_store_name as transactionStoreName
+        from transactionhistory
+        where
+        <foreach item="item" index="index" collection="cardNumberList"
+                 open="card_number in (" separator="," close=")">
+            #{item}
+        </foreach>
+        and transaction_date >= TO_DATE('2023-10-15', 'YYYY-MM-DD') - #{selectedDateInt}
+    </select>
+
+    <select id="getThisMonthTransactionHistoryListByCardNumber"
+            resultType="com.kopo.finalproject.model.dto.TransactionHistoryDTO">
+        select transaction_id as transactionId,
+        transaction_date as transactionDate,
+        transaction_amount as transactionAmount,
+        card_number as cardNumber,
+        member_id as memberId,
+        transaction_industry_code as transactionIndustryCode,
+        transaction_store_name as transactionStoreName
+        from transactionhistory
+        where
+        <foreach item="item" index="index" collection="cardNumberList"
+                 open="card_number in (" separator="," close=")">
+            #{item}
+        </foreach>
+        and EXTRACT(MONTH FROM transaction_date) = EXTRACT(MONTH FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+        AND EXTRACT(YEAR FROM transaction_date) = EXTRACT(YEAR FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+    </select>
+
+    <select id="getSelectedDateTransanctionHistroyListByCardNumber" resultType="com.kopo.finalproject.model.dto.TransactionHistoryDTO">
+        select transaction_id as transactionId,
+        transaction_date as transactionDate,
+        transaction_amount as transactionAmount,
+        card_number as cardNumber,
+        member_id as memberId,
+        transaction_industry_code as transactionIndustryCode,
+        transaction_store_name as transactionStoreName
+        from transactionhistory
+        where
+        <foreach item="item" index="index" collection="cardNumberList"
+                 open="card_number in (" separator="," close=")">
+            #{item}
+        </foreach>
+        AND transaction_date BETWEEN TO_DATE(#{firstDate}, 'YYYYMMDD') AND TO_DATE(#{secondDate}, 'YYYYMMDD')
+    </select>
+
+    <select id="getAllTransactionHistoryListByCardNumber"
+            resultType="com.kopo.finalproject.model.dto.TransactionHistoryDTO">
+        select transaction_id as transactionId,
+        transaction_date as transactionDate,
+        transaction_amount as transactionAmount,
+        card_number as cardNumber,
+        member_id as memberId,
+        transaction_industry_code as transactionIndustryCode,
+        transaction_store_name as transactionStoreName
+        from transactionhistory
+        where
+        <foreach item="item" index="index" collection="cardNumberList"
+                 open="card_number in (" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="getBenefitListByCardNumber" resultType="com.kopo.finalproject.model.dto.BenefitDTO">
+        select b.benefit_id            as benefitId,
+               b.card_id               as cardId,
+               b.card_performance      as cardPerformance,
+               b.benefit_code          as benefitCode,
+               b.benefit_industry_code as benefitIndustryCode,
+               b.benefit_store_name    as benefitStoreName,
+               b.benefit_amount        as benefitAmount,
+               b.benefit_max           as benefitMax
+        from membercard mc
+                 join card c on mc.card_id = c.card_id
+                 join benefit b on b.card_id = c.card_id
+        where mc.card_number = #{cardNumber}
+    </select>
+
+    <select id="getThisMonthTotal">
+        select sum(th.transaction_amount)
+        from card c
+                 join membercard mc
+                      on c.card_id = mc.card_id
+                 join transactionhistory th on th.card_number = mc.card_number
+        where c.card_id = #{cardId}
+          and mc.member_id = #{memberId}
+          and EXTRACT(MONTH FROM transaction_date) = EXTRACT(MONTH FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+          AND EXTRACT(YEAR FROM transaction_date) = EXTRACT(YEAR FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+    </select>
+
+    <select id="comparingBenefit" resultType="com.kopo.finalproject.model.dto.BenefitDTO">
+        select benefit_id            as benefitId,
+               card_id               as cardId,
+               card_performance      as cardPerformance,
+               benefit_code          as benefitCode,
+               benefit_industry_code as benefitIndustryCode,
+               benefit_store_name    as benefitStoreName,
+               benefit_amount        as benefitAmount,
+               benefit_max           as benefitMax
+        from benefit
+        where card_id = #{cardId}
+          and card_performance = #{cardPerformance}
+    </select>
+    <select id="drawSelectedDateTransactionHistoryChartByCardNumber" resultType="com.kopo.finalproject.model.dto.TransactionChartDTO">
+        select sum(transaction_amount) as transactionAmount,
+        transaction_industry_code as transactionIndustryCode
+        from transactionhistory
+        where
+        <foreach item="item" index="index" collection="cardNumberList"
+                 open="card_number in (" separator="," close=")">
+            #{item}
+        </foreach>
+        and transaction_date BETWEEN TO_DATE(#{firstDate}, 'YYYYMMDD') AND TO_DATE(#{secondDate}, 'YYYYMMDD')
+        group by transaction_industry_code
+    </select>
+    <select id="drawTransactionHistoryChartByCardNumber"
+            resultType="com.kopo.finalproject.model.dto.TransactionChartDTO">
+        select sum(transaction_amount) as transactionAmount,
+        transaction_industry_code as transactionIndustryCode
+        from transactionhistory
+        where
+        <foreach item="item" index="index" collection="cardNumberList"
+                 open="card_number in (" separator="," close=")">
+            #{item}
+        </foreach>
+        and transaction_date >= TO_DATE('2023-10-15', 'YYYY-MM-DD') - #{selectedDate}
+        group by transaction_industry_code
+    </select>
+    <select id="drawThisMonthTransactionHistoryChartByCardNumber"
+            resultType="com.kopo.finalproject.model.dto.TransactionChartDTO">
+        select sum(transaction_amount) as transactionAmount,
+        transaction_industry_code as transactionIndustryCode
+        from transactionhistory
+        where
+        <foreach item="item" index="index" collection="cardNumberList"
+                 open="card_number in (" separator="," close=")">
+            #{item}
+        </foreach>
+        and EXTRACT(MONTH FROM transaction_date) = EXTRACT(MONTH FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+        AND EXTRACT(YEAR FROM transaction_date) = EXTRACT(YEAR FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+        group by transaction_industry_code
+    </select>
+    <select id="drawAllTransactionHistoryChartByCardNumber"
+            resultType="com.kopo.finalproject.model.dto.TransactionChartDTO">
+        select sum(transaction_amount) as transactionAmount,
+        transaction_industry_code as transactionIndustryCode
+        from transactionhistory
+        where
+        <foreach item="item" index="index" collection="cardNumberList"
+                 open="card_number in (" separator="," close=")">
+            #{item}
+        </foreach>
+        group by transaction_industry_code
+    </select>
+
+    <select id="getLastMonthTotal">
+        select SUM(transaction_amount)
+        from transactionhistory
+        where card_number = (select card_number from transactionhistory where transaction_id = #{transactionId})
+          and member_id = #{memberId}
+          and EXTRACT(MONTH FROM transaction_date) =
+              EXTRACT(MONTH FROM ADD_MONTHS(
+                      (select transaction_date from transactionhistory where transaction_id = #{transactionId}), -1))
+          and EXTRACT(YEAR FROM transaction_date) =
+              EXTRACT(YEAR FROM ADD_MONTHS(
+                      (select transaction_date from transactionhistory where transaction_id = #{transactionId}), -1))
+    </select>
+    <!--    <select id="getThisMonthTransactionHistory" resultType="com.kopo.finalproject.model.dto.TransactionHistoryDTO">-->
+    <!--        select transaction_id            as transactionId,-->
+    <!--               transaction_date          as transactionDate,-->
+    <!--               transaction_amount        as transactionAmount,-->
+    <!--               card_number               as cardNumber,-->
+    <!--               member_id                 as memberId,-->
+    <!--               transaction_industry_code as transactionIndustryCode,-->
+    <!--               transaction_store_name    as transactionStoreName-->
+    <!--        from transactionhistory-->
+    <!--        where EXTRACT(MONTH FROM transaction_date) = EXTRACT(MONTH FROM SYSDATE)-->
+    <!--          AND EXTRACT(YEAR FROM transaction_date) = EXTRACT(YEAR FROM SYSDATE)-->
+    <!--          AND member_id = #{memberId}-->
+    <!--    </select>-->
+    <select id="getThisMonthTransactionHistory">
+        SELECT transaction_id            AS transactionId,
+               transaction_date          AS transactionDate,
+               transaction_amount        AS transactionAmount,
+               card_number               AS cardNumber,
+               member_id                 AS memberId,
+               transaction_industry_code AS transactionIndustryCode,
+               transaction_store_name    AS transactionStoreName
+        FROM transactionhistory
+        WHERE EXTRACT(MONTH FROM transaction_date) =
+              EXTRACT(MONTH FROM ADD_MONTHS(TO_DATE('2023-10-15', 'YYYY-MM-DD'), -#{selectedDate}))
+          AND EXTRACT(YEAR FROM transaction_date) =
+              EXTRACT(YEAR FROM ADD_MONTHS(TO_DATE('2023-10-15', 'YYYY-MM-DD'), -#{selectedDate}))
+          AND member_id = #{memberId} AND card_number = #{cardNumber}
+    </select>
+    <select id="getCardIdByTransaction">
+        select mc.card_id
+        from transactionhistory th
+                 join membercard mc on th.card_number = mc.card_number
+        where th.transaction_id = #{transactionId}
+    </select>
+
+    <select id="getBenefitAmountByTransaction" resultType="com.kopo.finalproject.model.dto.BenefitDTO">
+        select b.benefit_id            as benefitId,
+               b.card_id               as cardId,
+               b.card_performance      as cardPerformance,
+               b.benefit_code          as benefitCode,
+               b.benefit_industry_code as benefitIndustryCode,
+               b.benefit_store_name    as benefitStoreName,
+               b.benefit_amount        as benefitAmount,
+               b.benefit_max           as benefitMax,
+               b.benefit_group_code    as benefitGroupCode
+        from transactionhistory th
+                 join membercard mc on th.card_number = mc.card_number
+                 join benefit b on b.card_id = mc.card_id
+        where th.transaction_id = #{transactionId}
+          AND INSTR(th.transaction_store_name, b.benefit_store_name) > 0
+--           and SUBSTR(th.transaction_store_name, 1, INSTR(th.transaction_store_name, ' ') - 1) = b.benefit_store_name
+          AND b.benefit_group_code = (select benefit_group_code
+                                      from benefit
+                                      where card_id = #{cardId}
+                                        and benefit_industry_code = (select transaction_industry_code
+                                                                     from transactionhistory
+                                                                     where transaction_id = #{transactionId})
+                                        and #{lastMonthTotal} >= card_performance
+                                      order by card_performance desc
+                                          FETCH FIRST 1 ROWS ONLY)
+    </select>
+
+    <select id="getBenefitAmountByTransaction2" resultType="com.kopo.finalproject.model.dto.BenefitDTO">
+        select b.benefit_id            as benefitId,
+               b.card_id               as cardId,
+               b.card_performance      as cardPerformance,
+               b.benefit_code          as benefitCode,
+               b.benefit_industry_code as benefitIndustryCode,
+               b.benefit_store_name    as benefitStoreName,
+               b.benefit_amount        as benefitAmount,
+               b.benefit_max           as benefitMax,
+               b.benefit_group_code    as benefitGroupCode
+        from benefit b
+        where b.benefit_group_code = 'S037'
+    </select>
+
+
+    <select id="getBenefitCountFromTransactionHistory">
+        <![CDATA[
+        select count(*)
+        from transactionhistory
+        where transaction_id >= #{firstTransactionId}
+          and transaction_industry_code = #{transactionIndustryCode}
+          and card_number = #{cardNumber}
+          and EXTRACT(MONTH FROM transaction_date) = EXTRACT(MONTH FROM (select transaction_date
+                                                                         from transactionhistory
+                                                                         where transaction_id = #{transactionId}))
+          and EXTRACT(YEAR FROM transaction_date) = EXTRACT(YEAR FROM (select transaction_date
+                                                                       from transactionhistory
+                                                                       where transaction_id = #{transactionId}))
+        ]]>
+    </select>
+    <select id="getTransactionAmountListFromTransactionHistory">
+        <![CDATA[
+        select transaction_amount
+        from transactionhistory
+        where transaction_id >= #{firstTransactionId}
+          and transaction_id <= #{transactionId}
+          and transaction_industry_code = #{transactionIndustryCode}
+          and card_number = #{cardNumber}
+          and EXTRACT(MONTH FROM transaction_date) = EXTRACT(MONTH FROM (select transaction_date
+                                                                         from transactionhistory
+                                                                         where transaction_id = #{transactionId}))
+          and EXTRACT(YEAR FROM transaction_date) = EXTRACT(YEAR FROM (select transaction_date
+                                                                       from transactionhistory
+                                                                       where transaction_id = #{transactionId}))
+        ]]>
+    </select>
+    <select id="getMyCard" resultType="com.kopo.finalproject.model.dto.MyCardDTO">
+        select mc.card_number       as cardNumber,
+               mc.card_password     as cardPassword,
+               mc.validation_period as validationPeriod,
+               mc.cvc_number        as cvcNumber,
+               mc.card_regdate      as cardRegDate,
+               mc.last_month_total  as lastMonthTotal,
+               mc.card_status_code  as cardStatus,
+               mc.card_id           as cardId,
+               mc.member_id         as memberId,
+               c.card_name          as cardName
+        from membercard mc
+                 join card c on mc.card_id = c.card_id
+        where mc.member_id = #{memberId}
+    </select>
+    <select id="getCardInfo" resultType="com.kopo.finalproject.model.dto.CardDTO">
+        select card_id        as cardId,
+               card_name      as cardName,
+               card_subtitle     cardSubTitle,
+               card_type_code as cardTypeCode,
+               annual_fee     as annualFee
+        from card
+        where card_id = (select card_id from membercard where member_id = #{memberId})
+    </select>
+
+    <select id="getTransactionAmountByTransactionId">
+        select transaction_amount
+        from transactionhistory
+        where transaction_id = #{transactionId}
+    </select>
+
+    <select id="getCardInfoByCardId" resultType="com.kopo.finalproject.model.dto.CardDTO">
+        select card_id        as cardId,
+               card_name      as cardName,
+               card_subtitle     cardSubTitle,
+               card_type_code as cardTypeCode,
+               annual_fee     as annualFee
+        from card
+        where card_id = #{cardId}
+    </select>
+    <select id="getTransactionId">
+        select transaction_id
+        from transactionhistory
+        where card_number = #{cardNumber}
+          AND TRUNC(transaction_date) = TO_DATE(#{transactionDate}, 'YYYYMMDD')
+          and transaction_amount = #{transactionAmount}
+          and transaction_industry_code = #{transactionIndustryCode}
+          and transaction_store_name = #{transactionStoreName}
+    </select>
+    <select id="getFirstTransactionId">
+        select transaction_id from transactionhistory where transaction_date = #{firstTransactionDate} and member_id = #{memberId} fetch first 1 rows only
+    </select>
+</mapper>

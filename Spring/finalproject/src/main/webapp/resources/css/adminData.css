@@ -1,0 +1,23 @@
+
+.carousel-inner .carousel-item .d-block {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.carousel-control-prev, .carousel-control-next {
+    width: auto;
+    opacity: 1;
+}
+
+
+
+.carousel-inner .carousel-item {
+    transition: none;
+}
+.carousel-control-prev {
+    left: 40%;
+}
+
+.carousel-control-next {
+    right: 40%;
+}

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kopo.finalproject.model.dao.AdminDAO">
+    <select id="getMemberList" resultType="com.kopo.finalproject.model.dto.MemberDTO">
+        SELECT member_id          as memberId,
+               name               as name,
+               personal_id        as personalIdNumber,
+               password           as password,
+               email              as email,
+               reg_date           as regDate,
+               gender             as gender,
+               phone_number       as phone,
+               zipcode            as zipcode,
+               address            as address,
+               detail_address     as detailAddress,
+               age                as age,
+               member_status_code as memberStatus
+        FROM member
+    </select>
+
+    <select id="getSearchChart" resultType="com.kopo.finalproject.model.dto.searchChartDTO">
+        select search_industry_code as searchIndustryCode, count(*) as searchCount
+        from search_history
+        group by search_industry_code
+        order by count(*) desc
+    </select>
+
+    <select id="getSearchChartByMonth"
+            resultType="com.kopo.finalproject.model.dto.searchChartDTO">
+        SELECT
+            search_industry_code AS searchIndustryCode,
+            count(*) AS searchCount
+        FROM search_history
+        WHERE EXTRACT(month FROM search_date) = EXTRACT(month FROM TO_DATE('2023-09-30', 'YYYY-MM-DD'))  - #{month}
+        GROUP BY search_industry_code
+    </select>
+
+    <select id="getCardList">
+        <![CDATA[
+        select card_id as cardId,
+        card_name    as cardName,
+        card_subTitle as cardSubTitle,
+        card_type_code as cardTypeCode,
+        annual_fee as annualFee
+        FROM (
+        SELECT *
+        FROM card
+        WHERE card_id IN (SELECT DISTINCT(card_id) FROM benefit WHERE benefit_industry_code = 'MT')
+        ORDER BY DBMS_RANDOM.VALUE
+        )
+        WHERE ROWNUM <= 4
+        ]]>
+    </select>
+
+    <select id="getBenefit" resultType="com.kopo.finalproject.model.dto.BenefitDTO">
+        SELECT benefit_id            as benefitId,
+               card_id               as cardId,
+               card_performance      as cardPerformance,
+               benefit_code          as benefitCode,
+               benefit_industry_code as benefitIndustryCode,
+               benefit_store_name    as benefitStoreName,
+               benefit_amount        as benefitAmount,
+               benefit_max           as benefitMax,
+               benefit_group_code    as benefitGroupCode
+        FROM benefit
+        WHERE card_id = #{cardId}
+          AND card_performance = (SELECT MAX(card_performance) FROM benefit WHERE card_id = #{cardId})
+    </select>
+
+    <select id="getBenefit2" resultType="com.kopo.finalproject.model.dto.BenefitDTO">
+        SELECT benefit_id            as benefitId,
+               card_id               as cardId,
+               card_performance      as cardPerformance,
+               benefit_code          as benefitCode,
+               benefit_industry_code as benefitIndustryCode,
+               benefit_store_name    as benefitStoreName,
+               benefit_amount        as benefitAmount,
+               benefit_max           as benefitMax,
+               benefit_group_code    as benefitGroupCode
+        FROM benefit
+        WHERE card_id = #{cardId}
+    </select>
+
+    <select id="getCardByCardId">
+        select card_id as cardId,
+               card_name as cardName,
+               card_subTitle as cardSubTitle,
+               card_type_code as cardTypeCode,
+               annual_fee as annualFee
+        from card
+        where card_id = #{cardId}
+    </select>
+
+    <select id="getMemberCardCount">
+        select count(*)
+        from membercard
+    </select>
+
+    <select id="getPayAmount">
+        select sum(transaction_amount) from transactionhistory
+    </select>
+    <select id="getTransactionChart">
+        select sum(transaction_amount) as transactionAmount,
+               transaction_industry_code as transactionIndustryCode
+        from transactionhistory
+        group by transaction_industry_code
+    </select>
+</mapper>

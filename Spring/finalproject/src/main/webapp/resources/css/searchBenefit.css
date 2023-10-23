@@ -1,0 +1,133 @@
+.title-bar{
+    border-radius: 20px;
+    padding: 1%;
+    background-color: #f9f9f9;
+    margin:0 auto;
+    text-align: center;
+    font-size: 5vh;
+    width: fit-content;
+}
+
+.wrap {
+    margin: 0 auto;
+    margin-top: 2%;
+    margin-bottom: 0.5%;
+    width: 60%;
+}
+
+.search {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    margin-bottom: 4%;
+}
+
+.searchTerm {
+    width: 100%;
+    border-right: none;
+    background-color: #f9f9f9;
+    padding: 2%;
+    height: 100%;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+    color: black;
+    font-size: 1vw;
+}
+
+
+.searchButton {
+    width: 10%;
+    background: #f9f9f9;
+    text-align: center;
+    color: black;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.search-section{
+    display: flex;
+}
+.search-rank{
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width:120vw;
+}
+.search-history {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 150vw;
+    margin-left: 3vw;
+}
+
+.list-group {
+    margin: 0;
+    padding: 0;
+}
+
+.list-group-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-group-item:not(.d-flex) {
+    display: flex;
+}
+.list-group-item:last-child {
+    margin-bottom: 0;
+}
+
+.search-date {
+    color: #888;
+}
+
+.search-place {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.search-place:hover {
+    color: #c5f6db;
+}
+
+.remove-btn {
+    background-color: #ff4b5a;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px; /
+}
+
+.remove-btn:hover {
+    background-color: #ff3333;
+}
+.rank-list{
+    margin-bottom: 5%;
+}
+.rank-list img{
+    width: 20%;
+    height: 20%;
+    margin-left: 10%;
+    margin-right: 10%;
+}

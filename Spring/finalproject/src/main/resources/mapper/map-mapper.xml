@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kopo.finalproject.model.dao.BenefitDAO">
+
+    <select id="getMatchingBenefitsByMap" parameterType="java.util.HashMap"
+            resultType="com.kopo.finalproject.model.dto.BenefitResultDTO">
+        SELECT c.card_name           AS cardName,
+               b.benefit_code        AS benefitCode, -- 추가된 부분
+               MAX(b.benefit_amount) AS benefitAmount,
+               MAX(b.benefit_max)    AS benefitMax
+        FROM member m
+                 JOIN membercard mc ON m.member_id = mc.member_id
+                 JOIN card c ON mc.card_id = c.card_id
+                 JOIN benefit b ON mc.card_id = b.card_id
+        WHERE m.member_id = #{memberId}
+          AND INSTR(#{searchStoreName}, b.benefit_store_name) > 0
+          AND mc.last_month_total >= b.card_performance
+        GROUP BY c.card_name, mc.last_month_total, b.benefit_code -- b.benefit_code를 GROUP BY에 추가
+    </select>
+
+    <select id="getMatchingBenefitsByMap2" parameterType="java.util.HashMap"
+            resultType="com.kopo.finalproject.model.dto.BenefitResultDTO">
+        SELECT c.card_name           AS cardName,
+               b.benefit_code        AS benefitCode,
+               MAX(b.benefit_amount) AS benefitAmount,
+               MAX(b.benefit_max)    AS benefitMax
+        FROM member m
+                 JOIN membercard mc ON m.member_id = mc.member_id
+                 JOIN card c ON mc.card_id = c.card_id
+                 JOIN benefit b ON mc.card_id = b.card_id
+        WHERE m.member_id = #{memberId}
+          AND #{groupCode} = b.benefit_industry_code
+          AND mc.last_month_total >= b.card_performance
+        GROUP BY c.card_name, mc.last_month_total, b.benefit_code
+    </select>
+    <select id="getMatchingBenefitsBySearch" resultType="com.kopo.finalproject.model.dto.CommonDTO">
+        SELECT c.card_name           AS cardName,
+               b.benefit_code        AS benefitCode,
+               MAX(b.benefit_amount) AS benefitAmount,
+               MAX(b.benefit_max)    AS benefitMax,
+               b.card_id             AS cardId,
+               c.card_subtitle       AS cardSubtitle
+        FROM member m
+                 JOIN membercard mc ON m.member_id = mc.member_id
+                 JOIN card c ON mc.card_id = c.card_id
+                 JOIN benefit b ON mc.card_id = b.card_id
+        WHERE m.member_id = #{memberId}
+          AND INSTR(#{searchData.place_name}, b.benefit_store_name) > 0
+          AND mc.last_month_total >= b.card_performance
+        GROUP BY c.card_name, mc.last_month_total, b.benefit_code, b.card_id, c.card_subtitle
+    </select>
+
+    <select id="getMatchingBenefitsBySearch2" resultType="com.kopo.finalproject.model.dto.CommonDTO">
+        SELECT c.card_name AS cardName,
+        b.benefit_code AS benefitCode,
+        MAX(b.benefit_amount) AS benefitAmount,
+        MAX(b.benefit_max) AS benefitMax,
+        b.card_id AS cardId,
+        c.card_subtitle AS cardSubtitle
+        FROM member m
+        JOIN membercard mc ON m.member_id = mc.member_id
+        JOIN card c ON mc.card_id = c.card_id
+        JOIN benefit b ON mc.card_id = b.card_id
+        WHERE m.member_id = #{memberId}
+        <choose>
+            <when test="searchData.category_group_code == 'MT1'">AND 'MT' = b.benefit_industry_code</when>
+            <when test="searchData.category_group_code == 'CS2'">AND 'CS' = b.benefit_industry_code</when>
+            <when test="searchData.category_group_code == 'PS3' or searchData.category_group_code == 'AC5'">AND 'ED' =
+                b.benefit_industry_code
+            </when>
+            <when test="searchData.category_group_code == 'OL7'">AND 'OL' = b.benefit_industry_code</when>
+            <when test="searchData.category_group_code == 'CT1'">AND 'CT' = b.benefit_industry_code</when>
+            <when test="searchData.category_group_code == 'FD6'">AND 'FD' = b.benefit_industry_code</when>
+            <when test="searchData.category_group_code == 'CE7'">AND 'CE' = b.benefit_industry_code</when>
+            <when test="searchData.category_group_code == 'HP8' or searchData.category_group_code == 'PM9'">AND 'MD' =
+                b.benefit_industry_code
+            </when>
+            <otherwise>
+                <!-- 기본값 설정 -->
+                <if test="searchData.category_name != null">
+                    <if test="searchData.category_name.contains('백화점') or searchData.category_name.contains('슈퍼')">AND
+                        'SH' = b.benefit_industry_code
+                    </if>
+                    <if test="!searchData.category_name.contains('백화점') and !searchData.category_name.contains('슈퍼')">
+                        AND 'AL' = b.benefit_industry_code
+                    </if>
+                </if>
+            </otherwise>
+        </choose>
+        AND mc.last_month_total >= b.card_performance
+        GROUP BY c.card_name, mc.last_month_total, b.benefit_code, b.card_id, c.card_subtitle
+    </select>
+
+    <insert id="insertSearchHistory">
+        insert into search_history (member_id, search_place, search_industry_code)
+        values (#{memberId}, #{searchHistory}, #{searchIndustryCode})
+    </insert>
+
+    <select id="getSearchHistoryList" resultType="com.kopo.finalproject.model.dto.SearchHistoryDTO">
+        select search_history_id    as searchHistoryId,
+               member_id            as memberId,
+               search_place         as searchPlace,
+               search_industry_code as searchIndustryCode,
+               search_date          as searchDate,
+               search_status_code   as searchStatusCode
+        from search_history
+        where member_id = #{memberId}
+          and search_status_code = 'T'
+        order by search_date desc
+    </select>
+
+    <update id="updateSearchStatus">
+        update search_history
+        set search_status_code = 'F'
+        where search_history_id = #{searchHistoryId}
+    </update>
+
+    <select id="selectSearchRank">
+        SELECT search_industry_code
+        FROM search_history
+        GROUP BY search_industry_code
+        ORDER BY COUNT(*) DESC, search_industry_code
+    </select>
+
+    <select id="getMemberCardIdList">
+        SELECT card_id as cardId
+        FROM membercard
+        WHERE member_id = #{memberId}
+    </select>
+
+    <select id="getNotBenefitList" resultType="com.kopo.finalproject.model.dto.CommonDTO">
+        <![CDATA[
+        SELECT MIN(b.card_performance) as cardPerformance,
+               mc.last_month_total     as lastMonthTotal,
+               c.card_id               as cardId,
+               c.card_name             as cardName,
+               c.card_subtitle         as cardSubtitle
+        FROM member m
+                 JOIN membercard mc ON m.member_id = mc.member_id
+                 JOIN benefit b ON mc.card_id = b.card_id
+                 JOIN card c ON mc.card_id = c.card_id
+        WHERE m.member_id = #{memberId}
+          AND mc.card_id = #{cardId}
+          AND mc.last_month_total < b.card_performance
+        GROUP BY mc.last_month_total, c.card_id, c.card_name, c.card_subtitle
+        ORDER BY MIN(b.card_performance)
+        ]]>
+    </select>
+
+
+    <select id="getBenefitId">
+        SELECT b.benefit_id
+        FROM member m
+                 JOIN membercard mc ON m.member_id = mc.member_id
+                 JOIN benefit b ON b.card_id = mc.card_id
+        WHERE m.member_id = #{memberId}
+          AND INSTR(#{searchData.place_name}, b.benefit_store_name) > 0
+          AND mc.last_month_total >= b.card_performance
+          AND mc.card_id = #{cardId}
+        ORDER BY b.benefit_max desc
+            FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <select id="getBenefitDTO" resultType="com.kopo.finalproject.model.dto.BenefitDTO">
+        select b.benefit_id            as benefitId,
+               b.card_id               as cardId,
+               b.card_performance      as cardPerformance,
+               b.benefit_code          as benefitCode,
+               b.benefit_industry_code as benefitIndustryCode,
+               b.benefit_store_name    as benefitStoreName,
+               b.benefit_amount        as benefitAmount,
+               b.benefit_max           as benefitMax,
+               b.benefit_group_code    as benefitGroupCode
+        from benefit b
+        where b.benefit_id = #{benefitId}
+    </select>
+    <select id="getBenefitCount">
+        SELECT count(DISTINCT t.transaction_id)
+        FROM transactionhistory t
+                 JOIN membercard mc on mc.member_id = t.member_id
+                 JOIN benefit b on mc.card_id = b.card_id
+        WHERE t.member_id = #{memberId}
+          AND b.card_performance = (select card_performance from benefit where benefit_id = #{benefitId})
+          AND t.transaction_industry_code = #{benefitIndustryCode}
+          AND EXTRACT(MONTH FROM t.transaction_date) = EXTRACT(MONTH FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+          AND EXTRACT(YEAR FROM t.transaction_date) = EXTRACT(YEAR FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+    </select>
+    <select id="getBenefitAmountList">
+        SELECT NVL(t.transaction_amount, 0) AS transactionAmount
+        FROM transactionhistory t
+        WHERE SUBSTR(t.transaction_store_name, 1, INSTR(t.transaction_store_name, ' ') - 1) =
+              SUBSTR(#{storeName}, 1, INSTR(#{storeName}, ' ') - 1)
+          AND t.member_id = #{memberId}
+          AND EXTRACT(MONTH FROM t.transaction_date) = EXTRACT(MONTH FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+          AND EXTRACT(YEAR FROM t.transaction_date) = EXTRACT(YEAR FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+    </select>
+
+    <select id="getCardID">
+        SELECT card_id
+        FROM card
+        where card_name = #{cardName}
+    </select>
+</mapper>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kopo.finalproject.model.dao.PayDAO">
+
+    <select id="getMyCardList" resultType="com.kopo.finalproject.model.dto.MyCardDTO">
+        select mc.card_number       as cardNumber,
+               mc.card_password     as cardPassword,
+               mc.validation_period as validationPeriod,
+               mc.cvc_number        as cvcNumber,
+               mc.card_regdate      as cardRegDate,
+               mc.last_month_total  as lastMonthTotal,
+               mc.card_status_code  as cardStatus,
+               mc.card_id           as cardId,
+               mc.member_id         as memberId,
+               c.card_name          as cardName
+        from membercard mc
+                 join card c on mc.card_id = c.card_id
+        where mc.member_id = #{memberId}
+    </select>
+
+    <select id="getCardNumber">
+        select card_number
+        from membercard
+        where card_id = #{cardId}
+        and member_id = #{memberId}
+    </select>
+    
+
+    <select id="checkBenefit">
+        SELECT b.benefit_id
+        FROM member m
+                 JOIN membercard mc ON m.member_id = mc.member_id
+                 JOIN benefit b ON b.card_id = mc.card_id
+        WHERE m.member_id = #{memberId}
+          AND UPPER(SUBSTR(#{storeName}, 1, INSTR(#{storeName}, ' ') - 1)) = UPPER(b.benefit_store_name)
+          AND mc.last_month_total >= b.card_performance
+          AND mc.card_id = #{cardId}
+        ORDER BY b.benefit_max desc
+            FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <select id="selectBenefit" resultType="com.kopo.finalproject.model.dto.BenefitDTO">
+        select benefit_id            as benfitId,
+               card_id               as cardId,
+               card_performance      as cardPerformance,
+               benefit_code          as benefitCode,
+               benefit_industry_code as benefitIndustryCode,
+               benefit_store_name    as benefitStoreName,
+               benefit_amount        as benefitAmount,
+               benefit_max           as benefitMax
+        from benefit
+        where benefit_id = #{benefitId}
+    </select>
+    <select id="checkBenefitCount" resultType="int">
+        SELECT COUNT(DISTINCT t.transaction_id)
+        FROM transactionhistory t
+                 JOIN membercard mc ON mc.member_id = t.member_id
+                 JOIN benefit b ON mc.card_id = b.card_id
+        WHERE mc.member_id = #{memberId}
+          AND b.card_performance = #{cardPerformance}
+          AND t.transaction_industry_code = #{benefitIndustryCode}
+          AND b.benefit_industry_code = t.transaction_industry_code
+          AND EXTRACT(MONTH FROM t.transaction_date) = EXTRACT(MONTH FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+          AND EXTRACT(YEAR FROM t.transaction_date) = EXTRACT(YEAR FROM TO_DATE('2023-10-15', 'YYYY-MM-DD'))
+    </select>
+
+    <insert id="insertTransaction">
+        insert into transactionhistory (transaction_amount, card_number, member_id, transaction_industry_code, transaction_store_name)
+        values (#{price}, #{cardNumber}, #{memberId}, #{storeCategoryCode}, #{storeName})
+    </insert>
+</mapper>

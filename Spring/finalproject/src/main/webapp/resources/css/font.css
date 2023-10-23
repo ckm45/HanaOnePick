@@ -1,0 +1,15 @@
+@font-face {
+    font-family: 'Hana2-CM';
+    src: url('../../resources/fonts/Hana2-CM.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+body {
+    font-family: 'Hana2-CM', sans-serif !important;
+}
+
+.btn{
+    background-color: #00857E !important;
+}

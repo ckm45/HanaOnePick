@@ -1,0 +1,115 @@
+.result-title {
+    text-align: center;
+}
+
+.card {
+    /*max-width: 70%;*/
+    max-height: 60%;
+    margin: 0 auto;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: #f7f7f7;
+}
+.card:hover {
+    transform: scale(1.03);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card .row {
+    overflow: hidden;
+}
+
+.card img {
+    transition: transform 0.3s;
+    border-radius: 10px 0 0 10px;
+}
+
+.card:hover img {
+    transform: scale(1.1);
+}
+
+.card-body {
+    padding: 2% 5%;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.text-muted {
+    color: #999;
+}
+
+.calculator {
+    height: 5vh;
+    margin-bottom: 3%;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.calculator input {
+    margin-left: 0.5%;
+    margin-right: 0.5%;
+    height: 100%;
+    border: 3px solid #ccc;
+    width: 15%;
+    border-radius: 20px;
+    font-size: 1.5rem;
+    text-align: right;
+}
+
+.accordion-section{
+    width: 65%;
+    margin: 0 auto;
+}
+
+.accordion-section button{
+    border-radius: 20px;
+    margin-bottom: 2%;
+}
+
+.accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+}
+
+
+
+.panel {
+    padding: 0 18px;
+    background-color: white;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+.not-benefit-title{
+    padding: 1%;
+    width: fit-content;
+    font-size: 1vw;
+}
+.not-benefit-title img{
+    width: 2.3vw;
+}
+
+
+.col .p-3 >img{
+    width: 8vw;
+}
