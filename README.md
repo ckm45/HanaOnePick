@@ -36,7 +36,7 @@
 
 # 3. 프로젝트 결과
 
-최종 발표 PPT
+[최종 발표 PPT](/하나원픽_최경민.pdf)
 
 ## 3-1. 주요 기능
 <img src="img/주요기능.png"/>
@@ -76,3 +76,20 @@
 ## 5. ERD
 
 <img src="img/ERD.png"/>
+
+## 6. 시연 동영상
+<a href="https://youtu.be/LJ6luzIEiQI?si=gqJPEN_9GXFwIRU0"><img src="img/썸네일.png"></a><br/>
+
+## 7. 본인 소개
+
+|구분|내용|비고|
+|---|---|---|
+|이름|최경민|<img src="img/pic.jpg" width= "150"/>|
+|연락처|ckm45@naver.com||
+|Frontend skill|HTML, CSS, Javascript||
+|Backend skill|Java, Spring, Oracle||
+|자격증| 정보처리기사 | 2022.11 |
+|| OPIc(영어, IM1) | 2022. 09 |
+|| 리눅스마스터 2급 | 2022. 12 |
+|대외/내 활동|교내 캡스톤 디자인 (사용자 맞춤형 축구화 추천 어플리케이션)|2022년 09월 ~ 2022년 11월|
+|교육활동|하나금융티아이 채용전환형 교육 1200시간( 한국폴리텍대학교 광명융합기술교육원 - 데이터분석과 )|2023년 03월 ~ 2023년 10월|
