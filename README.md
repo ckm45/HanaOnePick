@@ -77,7 +77,10 @@
 
 <img src="img/ERD.png"/>
 
-## 6. 본인 소개
+## 6. 시연 동영상
+<a href="https://youtu.be/LJ6luzIEiQI?si=gqJPEN_9GXFwIRU0"><img src="img/썸네일.png"></a><br/>
+
+## 7. 본인 소개
 
 |구분|내용|비고|
 |---|---|---|
